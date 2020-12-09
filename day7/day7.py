@@ -1,18 +1,7 @@
-from typing import List, Dict
+from typing import Dict
 
 
-def parse_contains(contains: str) -> List[str]:
-    if contains == "no other bags.":
-        return []
-    output = []
-    contains = contains[:-1]
-    for item in contains.split(", "):
-        bags_index = item.index(" bag")
-        output.append(item[2:bags_index])
-    return output
-
-
-def parse_contains_2(contains: str) -> Dict[str, int]:
+def parse_contains(contains: str) -> Dict[str, int]:
     if contains == "no other bags.":
         return {}
     output = {}
@@ -23,13 +12,13 @@ def parse_contains_2(contains: str) -> Dict[str, int]:
     return output
 
 
-def can_contain(bag_map: Dict[str, List[str]], start_bag: str, end_bag: str, memo: Dict[str, bool]) -> bool:
+def can_contain(bag_map: Dict[str, Dict[str, int]], start_bag: str, end_bag: str, memo: Dict[str, bool]) -> bool:
     if start_bag in memo:
         return memo[start_bag]
     if end_bag in bag_map[start_bag]:
         memo[start_bag] = True
         return True
-    for bag in bag_map[start_bag]:
+    for bag in bag_map[start_bag].keys():
         if can_contain(bag_map, bag, end_bag, memo):
             memo[start_bag] = True
             return True
@@ -39,7 +28,7 @@ def can_contain(bag_map: Dict[str, List[str]], start_bag: str, end_bag: str, mem
 
 def part_1(bag_rules: str) -> int:
     bag_rules_list = bag_rules.split("\n")
-    bag_map: Dict[str, List[str]] = dict()
+    bag_map: Dict[str, Dict[str, int]] = dict()
     for rule in bag_rules_list:
         bag, contains = rule.split(" bags contain ")
         bag_map[bag] = parse_contains(contains)
@@ -67,7 +56,7 @@ def part_2(bag_rules: str) -> int:
     bag_map: Dict[str, Dict[str, int]] = dict()
     for rule in bag_rules_list:
         bag, contains = rule.split(" bags contain ")
-        bag_map[bag] = parse_contains_2(contains)
+        bag_map[bag] = parse_contains(contains)
     return count_bags_in(bag_map, "shiny gold") - 1
 
 
